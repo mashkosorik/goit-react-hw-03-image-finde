@@ -1,69 +1,41 @@
-import React, { Component } from "react";
-import PhoneBook from "./Components/Phone/PhoneBook";
-import PhoneEditor from "./Components/Phone/PhoneEditor";
-import PhoneFilter from "./Components/Phone/PhoneFilter";
-import { v4 as uuid } from "uuid";
+import React, { Component } from 'react'
+import { ToastContainer } from 'react-toastify'
+import ApiInfo from './Components/ApiInfo'
+
+// import { v4 as uuid } from 'uuid'
+import Button from './Components/Button'
+import ImageGallery from './Components/ImageGallery'
+
+import Loader from './Components/Loader'
+import Modal from './Components/Modal'
+import Searchbar from './Components/Searchbar'
 
 export default class App extends Component {
-  state = {
-    contacts: [],
-    name: "",
-    filter: "",
-  };
-
-  addNewContact = (object) => {
-    this.setState({
-      contacts: [...this.state.contacts, object],
-    });
-  };
-  componentDidMount() {
-    const oldContacts = localStorage.getItem("contacts");
-    if (oldContacts) {
-      this.setState({
-        contacts: JSON.parse(oldContacts),
-      });
-    }
+  state = { galery: null, q: '', page: 1, inputValue: '' }
+  // const BASE_URL =`https://pixabay.com/api/?q=${input}&page=1&key=18864788-659534fccb4bfac7e1ae65a8e&image_type=photo&orientation=horizontal&per_page=12`
+  // componentDidMount() {
+  //   const galery = fetch(
+  //     'https://pixabay.com/api/?q=${input}&page=1&key=18864788-659534fccb4bfac7e1ae65a8e&image_type=photo&orientation=horizontal&per_page=12',
+  //   )
+  //     .then((res) => res.json())
+  //     .then(console.log)
+  // }
+  onHandleSubmit = (inputValue) => {
+    this.setState({ inputValue })
+    console.log(inputValue)
   }
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.contacts !== this.state.contacts) {
-      localStorage.setItem("contacts", JSON.stringify(this.state.contacts));
-    }
-  }
-
-  deleteContact = (e) => {
-    const id = e.target.id;
-    this.setState((prevState) => ({
-      contacts: [...prevState.contacts.filter((contact) => contact.id !== id)],
-    }));
-  };
-
-  onHandleChangeFilter = (e) => {
-    this.setState({ filter: e.target.value });
-  };
-
-  getFiltredContacts = () => {
-    return [
-      ...this.state.contacts.filter((contact) =>
-        contact.name
-          .toLowerCase()
-          .includes(this.state.filter.toLocaleLowerCase())
-      ),
-    ];
-  };
-
   render() {
     return (
       <>
-        <PhoneEditor x={this.addNewContact} />
-        <PhoneFilter
-          filter={this.state.filter}
-          onHandleChangeFilter={this.onHandleChangeFilter}
-        />
-        <PhoneBook
-          contactList={this.getFiltredContacts()}
-          deleteContact={this.deleteContact}
-        />
+        <Searchbar onSubmit={this.onHandleSubmit} />
+        <ApiInfo inputValue={this.state.inputValue} />
+        <ImageGallery image={this.state.galery} />
+
+        <Loader />
+        <Button />
+        <Modal />
+        <ToastContainer autoClose={3000} />
       </>
-    );
+    )
   }
 }
